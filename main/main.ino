@@ -5,10 +5,9 @@
 #define buzzer 11
 #define MOTOR 3
 #define interruptor A1
-#define FRECUENCIA_ALTA 8
 #define FRECUENCIA_BAJA 3
 #define FRECUENCIA_TERMINADO 720
-int rpm = 2; //La velocidad del motor del plato.
+int rpm = 1; //La velocidad del motor del plato.
 bool cancelado = false; // Con este bool activo la cancelacion usando '*'
 
 //Globales para programa de coccion personalizado
@@ -60,6 +59,7 @@ void setup() {
 // --------------------------------------------------------------------
 // --------------------- VOID LOOP ------------------
 void loop() {
+  
   // MENU PRINCIPAL EN DISPLAY
   lcd.setCursor(0,0);
   lcd.print("ELIGE UNA OPCION");
@@ -182,9 +182,8 @@ void modoPrograma(unsigned long duracionCoccion,
 
     while ((millis() - tiempoInicio - tiempoPausado) < duracionCoccion) {
       //Inicia el programa y cuenta regresiva sin tener en cuenta las pausas
-      
       //MAGNETRON EN FUNCIONAMIENTO
-      tone(buzzer, FRECUENCIA_ALTA, 1000);
+      digitalWrite(buzzer, HIGH); //ME INTERFIERE CON EL MOTOR CC
       
       if (verificarCancelacion()) {
         cancelado = true;
@@ -241,6 +240,7 @@ void modoPrograma(unsigned long duracionCoccion,
 
   lcd.clear();
   if (cancelado) {
+    digitalWrite(buzzer, LOW);
     lcd.setCursor(0, 0);
     lcd.print("CANCELADO!");
     delay(1000);
@@ -272,7 +272,8 @@ unsigned long bloquearPuerta() {
   lcd.print("CIERRE LA PUERTA");
   lcd.setCursor(1, 1);
   lcd.print("PARA COMENZAR!");
-
+  digitalWrite(buzzer, LOW);
+  
   unsigned long pausaInicio = millis();
   while (digitalRead(interruptor) == HIGH) {
     delay(50);
@@ -414,6 +415,3 @@ void menuConfiguracion() {//Este es nuestro sub-menu con dos opciones para perso
     delay(100);
   }
 }
-
-
-
